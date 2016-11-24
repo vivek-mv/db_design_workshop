@@ -27,11 +27,19 @@ class Skills extends CI_Model {
      */
     public function insert($skill_name) {
 
-        $data = array(
-            'name' => $skill_name,
-        );
+        try {
+            $data = array(
+                'name' => $skill_name,
+            );
 
-        $this->db->insert('skill', $data);
+            $this->db->insert('skill', $data);
+        } catch (Exception $ex) {
+            $error_msg = 'An error occured while trying to insert data into database, near line no. 31-35 in Employee.php model : ';
+            log_message('error', $error_msg . $ex);
+            show_error('An error occured while trying to insert data into database. Please try again later', '', $heading = 'An Error Was Encountered');
+            exit();
+        }
+
     }
 
     /**
@@ -42,10 +50,17 @@ class Skills extends CI_Model {
      */
     public function get_skill_id($skill_name) {
 
-        $this->db->where('name', $skill_name);
-        $query = $this->db->get('skill');
-        return $query->result()[0]->id;
+        try {
+            $this->db->where('name', $skill_name);
+            $query = $this->db->get('skill');
+            
+            return $query->result()[0]->id;
+        } catch (Exception $ex) {
+            $error_msg = 'An error occured while trying to get data from database, near line no. 31-35 in Employee.php model : ';
+            log_message('error', $error_msg . $ex);
+            show_error('An error occured while trying to get data from database. Please try again later', '', $heading = 'An Error Was Encountered');
+            exit();
+        }
     }
-
 }
 ?>

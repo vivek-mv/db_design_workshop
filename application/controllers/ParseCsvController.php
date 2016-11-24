@@ -22,7 +22,7 @@ class ParseCsvController extends CI_Controller {
     public function parse() {
 
         //Note start time to calculate total time taken in parsing and storing data
-        $start_time = time();
+        $start_time = microtime();
 
         $this->load->library('csvparser');
 
@@ -61,7 +61,7 @@ class ParseCsvController extends CI_Controller {
         $this->csvparser->insert_employee_skills_lookup();
 
         //Note end time to calculate total time taken in parsing and storing data
-        $end_time = time();
+        $end_time = microtime();
 
         echo 'Data inserted successfully in ';
         echo $end_time - $start_time;

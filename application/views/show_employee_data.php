@@ -55,9 +55,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         foreach ($employee_details as $emp_data) {
 
             echo '<tr>';
-            echo '<td>' . $emp_data->emp_id . '</td>';
-            echo '<td>' . $emp_data->first_name . '</td>';
-            echo '<td>' . $emp_data->last_name . '</td>';
+            echo '<td>' . htmlspecialchars($emp_data->emp_id) . '</td>';
+            echo '<td>' . htmlspecialchars($emp_data->first_name) . '</td>';
+            echo '<td>' . htmlspecialchars($emp_data->last_name) . '</td>';
 
             $skills = array();
 
@@ -71,16 +71,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             //Loop through $skills and fill in the skills field
             for ( $i = 0; $i < 5; $i++ ) {
                 if ( isset($skills[$i]) ) {
-                    echo '<td>' . $skills[$i] . '</td>';
+                    echo '<td>' . htmlspecialchars($skills[$i]) . '</td>';
                 } else {
                     echo '<td></td>';
                 }
             }
 
-            echo '<td>' . $emp_data->stack_id . '</td>';
-            echo '<td>' . $emp_data->nickname . '</td>';
-            echo '<td>' . $emp_data->created_by . '</td>';
-            echo '<td>' . $emp_data->updated_by . '</td>';
+            echo '<td>' . htmlspecialchars($emp_data->stack_id) . '</td>';
+            echo '<td>' . htmlspecialchars($emp_data->nickname) . '</td>';
+            echo '<td>' . htmlspecialchars($emp_data->created_by) . '</td>';
+            echo '<td>' . htmlspecialchars($emp_data->updated_by) . '</td>';
             echo '</tr>';
 
         }

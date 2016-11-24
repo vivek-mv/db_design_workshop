@@ -27,11 +27,19 @@ class Hr extends CI_Model {
      */
     public function insert($hr_initials) {
 
-        $data = array(
-            'name' => $hr_initials,
-        );
+        try {
+            $data = array(
+                'name' => $hr_initials,
+            );
 
-        $this->db->insert('hr', $data);
+            $this->db->insert('hr', $data);
+        } catch (Exception $ex) {
+            $error_msg = 'An error occured while trying to insert data into database, near line no. 31-35 in Employee.php model : ';
+            log_message('error', $error_msg . $ex);
+            show_error('An error occured while trying to insert data into database. Please try again later', '', $heading = 'An Error Was Encountered');
+            exit();
+        }
+
     }
 
     /**
@@ -42,10 +50,18 @@ class Hr extends CI_Model {
      */
     public function get_hr_id($hr_initials) {
 
-        $this->db->where('name', $hr_initials);
-        $query = $this->db->get('hr');
+        try {
+            $this->db->where('name', $hr_initials);
+            $query = $this->db->get('hr');
 
-        return $query->result()[0]->id;
+            return $query->result()[0]->id;
+        } catch (Exception $ex) {
+            $error_msg = 'An error occured while trying to get data from database, near line no. 31-35 in Employee.php model : ';
+            log_message('error', $error_msg . $ex);
+            show_error('An error occured while trying to get data from database. Please try again later', '', $heading = 'An Error Was Encountered');
+            exit();
+        }
+
     }
 
 }

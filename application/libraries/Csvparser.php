@@ -14,6 +14,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Csvparser {
 
     protected $CI;
+    public static $csv_array = [];
+    public static $is_first_time = true;
 
     // We'll use a constructor, as you can't directly call a function
     // from a property definition.
@@ -21,6 +23,55 @@ class Csvparser {
     {
         // Assign the CodeIgniter super-object
         $this->CI =& get_instance();
+
+        if ( Csvparser::$is_first_time ) {
+            Csvparser::$is_first_time = false;
+
+            try {
+                $file = fopen("data.csv","r");
+
+                $skip_first_record = true;
+                $field_lengths = [10, 20, 20, 50, 50, 50, 50, 50, 11, 20, 2, 2];
+
+                while ( ($data = fgetcsv($file, '', ";")) !== FALSE) {
+
+                    if ( $skip_first_record ) {
+                        $skip_first_record = false;
+                        continue;
+                    }
+
+                    for ( $i = 0; $i < 11; $i++ ) {
+
+                        //Check for required fields
+                        if ( in_array($i, [0,1,2,8,9,10,11]) && trim($data[$i]) === '' ) {
+                            echo 'All fields are required, except skills';
+                            exit;
+                        }
+
+                        //Check for length of the fields
+                        if ( strlen($data[$i]) > $field_lengths[$i] ) {
+                            echo $data[$i] . ' should only be ' . $field_lengths[$i] . 'characters long';
+                            exit;
+                        }
+
+                        //Strip Html tags and slashes
+                        stripslashes($data[$i]);
+                        strip_tags($data[$i]);
+                    }
+
+                    array_push(Csvparser::$csv_array, $data);
+                }
+
+                fclose($file);
+            } catch (Exception $ex) {
+
+                $error_msg = 'An error occured while trying to fetch data from the file, near line no. 31-45 in Csvparser.php library : ';
+                log_message('error', $error_msg . $ex);
+                echo 'An error occured while trying to fetch data from the file. Please try again later';
+                exit();
+            }
+
+        }
     }
 
     /**
@@ -31,13 +82,11 @@ class Csvparser {
      */
     public function get_hr_names()
     {
-        $file = fopen("data.csv","r");
-
         $skip_first_record = true;
 
         $hr_names = [];
 
-        while ( ($data = fgetcsv($file, '', ";")) !== FALSE) {
+        foreach ( Csvparser::$csv_array as $data ) {
 
             if ( $skip_first_record ) {
                 $skip_first_record = false;
@@ -46,8 +95,6 @@ class Csvparser {
 
             array_push($hr_names, $data[10], $data[11]);
         }
-
-        fclose($file);
 
         return array_unique($hr_names);
     }
@@ -60,13 +107,11 @@ class Csvparser {
      */
     public function get_skills()
     {
-        $file = fopen("data.csv","r");
-
         $skip_first_record = true;
 
         $skills = [];
 
-        while ( ($data = fgetcsv($file, '', ";"))  !== FALSE) {
+        foreach ( Csvparser::$csv_array as $data ) {
 
             if ( $skip_first_record ) {
                 $skip_first_record = false;
@@ -75,8 +120,6 @@ class Csvparser {
 
             array_push($skills, $data[3], $data[4], $data[5], $data[6], $data[7]);
         }
-
-        fclose($file);
 
         return array_unique($skills);
     }
@@ -89,11 +132,9 @@ class Csvparser {
      */
     public function insert_employee_details()
     {
-        $file = fopen("data.csv","r");
-
         $skip_first_record = true;
 
-        while ( ($data = fgetcsv($file, '', ";"))  !== FALSE) {
+        foreach ( Csvparser::$csv_array as $data ) {
 
             if ( !$skip_first_record) {
                 $this->CI->employee->insert($data[0], $data[1], $data[2], $data[10], $data[11]);
@@ -102,7 +143,6 @@ class Csvparser {
             }
         }
 
-        fclose($file);
     }
 
     /**
@@ -113,11 +153,9 @@ class Csvparser {
      */
     public function insert_employee_stack_details()
     {
-        $file = fopen("data.csv","r");
-
         $skip_first_record = true;
 
-        while ( ($data = fgetcsv($file, '', ";"))  !== FALSE ) {
+        foreach ( Csvparser::$csv_array as $data ) {
 
             if ( !$skip_first_record) {
                 $this->CI->stackinfo->insert($data[0], $data[8], $data[9]);
@@ -125,8 +163,6 @@ class Csvparser {
                 $skip_first_record = false;
             }
         }
-
-        fclose($file);
     }
 
     /**
@@ -137,13 +173,11 @@ class Csvparser {
      */
     public function insert_employee_skills_lookup()
     {
-        $file = fopen("data.csv","r");
-
         $skip_first_record = true;
 
         $skill_no = [3, 4, 5, 6, 7];
 
-        while ( ($data = fgetcsv($file, '', ";")) !== FALSE) {
+        foreach ( Csvparser::$csv_array as $data ) {
 
             if ( !$skip_first_record ) {
                 foreach ($skill_no as $item){
@@ -155,8 +189,6 @@ class Csvparser {
                 $skip_first_record = false;
             }
         }
-
-        fclose($file);
     }
 }
 ?>

@@ -29,13 +29,20 @@ class Stackinfo extends CI_Model {
      */
     public function insert($emp_id, $stack_id, $nickname) {
 
-        $data = array(
-            'emp_id' => $this->employee->get_employee_id($emp_id),
-            'stack_id' => $stack_id,
-            'nickname' => $nickname
-        );
+        try {
+            $data = array(
+                'emp_id' => $this->employee->get_employee_id($emp_id),
+                'stack_id' => $stack_id,
+                'nickname' => $nickname
+            );
 
-        $this->db->insert('employee_stackinfo', $data);
+            $this->db->insert('employee_stackinfo', $data);
+        } catch (Exception $ex) {
+            $error_msg = 'An error occured while trying to insert data into database, near line no. 31-35 in Employee.php model : ';
+            log_message('error', $error_msg . $ex);
+            show_error('An error occured while trying to insert data into database. Please try again later', '', $heading = 'An Error Was Encountered');
+            exit();
+        }
     }
 }
 ?>
